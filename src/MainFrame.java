@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,12 +21,12 @@ public class MainFrame extends JFrame
 	private static final long serialVersionUID = 1L;
 	public static HashMap<String, Component> impComponents;
 	public static final int DEFAULT_ITEM_SIZE = 150;
-	public static final short FIRST_CHOOSE_STATE = 0;
-	public static final short SECOND_CHOOSE_STATE = 1;
+	public static final long MESSAGE_SLEEP_TIME = 0;
 	private ArrayList<State> states;
-	private short state;
+	private int state;
 	private int totalTests;
 	private int succeedTests;
+	private Random rand;
 	
 	public MainFrame()
 	{
@@ -36,8 +37,12 @@ public class MainFrame extends JFrame
 		setLayout(new BorderLayout());
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		totalTests = 0;
+		succeedTests = 0;
 		state = 0;
 		states = new ArrayList<>();
+		rand = new Random();
 		
 		JLabel message = new JLabel("Choose one of boxes:");						// Creating message label
 		message.setBackground(Color.CYAN);
@@ -56,9 +61,13 @@ public class MainFrame extends JFrame
 		choices.add(choice2);
 		choices.add(choice3);
 		add(choices, BorderLayout.CENTER);
-		impComponents.put("Choice 1 JButton", choice1);
-		impComponents.put("Choice 2 JButton", choice2);
-		impComponents.put("Choice 3 JButton", choice3);
+		BoxHandler handler = new BoxHandler();
+		choice1.addActionListener(handler);
+		choice2.addActionListener(handler);
+		choice3.addActionListener(handler);
+		impComponents.put("Choice 1 Box", choice1);
+		impComponents.put("Choice 2 Box", choice2);
+		impComponents.put("Choice 3 Box", choice3);
 		
 		JPanel stats = new JPanel(new FlowLayout(FlowLayout.LEADING));				// Creating stats details
 		JLabel total = new JLabel("0");
@@ -70,7 +79,16 @@ public class MainFrame extends JFrame
 		add(stats, BorderLayout.SOUTH);
 		impComponents.put("Total Tests JLabel", total);
 		impComponents.put("Correct Choices JLabel", corrs);
+		
 		addStates();
+		
+		try
+		{
+			states.get(0).act(null);
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	private void addStates()
@@ -79,11 +97,111 @@ public class MainFrame extends JFrame
 		{
 			
 			@Override
-			public void act()
+			public void act(Object source)
 			{
+				showMessage("Choose one of boxes:");
 				
+				for(int i = 1; i < 4; ++i)
+				{
+					Box box = (Box) impComponents.get("Choice " + i + " Box");
+					box.fillWith(new Goat());
+					box.close();
+				}
+				
+				String box = "Choice " + (rand.nextInt(3) + 1) + " Box";
+				System.out.println(box);
+				((Box)impComponents.get(box)).fillWith(new Car());
+				
+				state++;
 			}
 		};
+		
+		State secondChoose = new State()
+		{
+			
+			@Override
+			public void act(Object source) throws Exception
+			{
+				if(((Box)source).isOpened())
+					return;
+				
+				showMessage("We open a box for you. Do you change? Choose one box.");
+				
+				int index = 0;
+				do
+				{
+					index = (rand.nextInt(3) + 1);
+				}
+				while(index == getBoxIndex(source) || getBox(index).containsCar());
+				
+				getBox(index).open();
+				
+				state++;
+			}
+		};
+	
+		State message2 = new State()
+		{
+			
+			@Override
+			public void act(Object source)
+			{
+				Box box = (Box) source;
+				
+				if(box.isOpened())
+					return;
+				box.open();
+				
+				if(box.containsCar())
+				{
+					showMessage("You won a car! Click any box.", Color.green);
+					succeedTests++;
+				}
+				else
+					showMessage("You won a goat! Click any box.", Color.orange);
+				
+				totalTests++;
+				updateGameStats();
+				
+				state = 0;
+			}
+		};
+	
+		states.add(firstChoose);
+		states.add(secondChoose);
+		states.add(message2);
+	}
+	
+	private void updateGameStats()
+	{
+		((JLabel)impComponents.get("Total Tests JLabel")).setText("" + totalTests);
+		((JLabel)impComponents.get("Correct Choices JLabel")).setText("" + succeedTests);
+	}
+	
+	private void showMessage(String s)
+	{
+		showMessage(s, Color.cyan);
+	}
+	
+	private void showMessage(String s, Color color)
+	{
+		JLabel m = (JLabel)impComponents.get("Message JLabel");
+		m.setText(s);
+		m.setBackground(color);
+		m.updateUI();
+	}
+	
+	private Box getBox(int i)
+	{
+		return (Box) impComponents.get("Choice " + i + " Box");
+	}
+	
+	private int getBoxIndex(Object box) throws Exception
+	{
+		for(int i = 1; i < 4; ++i)
+			if(impComponents.get("Choice " + i + " Box") == box)
+				return i;
+		throw new Exception("Box not found!");
 	}
 
 	public static void main(String[] args)
@@ -97,7 +215,13 @@ public class MainFrame extends JFrame
 		@Override
 		public void actionPerformed(ActionEvent arg0)
 		{
-			
+				try
+				{
+					states.get(state).act(arg0.getSource());
+				} catch (Exception e)
+				{
+					throw new RuntimeException(e.getMessage());
+				}
 		}
 		
 	}

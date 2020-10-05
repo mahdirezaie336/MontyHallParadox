@@ -1,5 +1,5 @@
 
 public interface State
 {
-	public void act();
+	public void act(Object source) throws Exception;
 }

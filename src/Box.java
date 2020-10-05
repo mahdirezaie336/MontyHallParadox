@@ -10,6 +10,7 @@ public class Box extends JButton implements Item
 {
 	private static final long serialVersionUID = 1L;
 	private Item item;
+	private boolean open;
 
 	public Box()
 	{
@@ -22,6 +23,7 @@ public class Box extends JButton implements Item
 			e.printStackTrace();
 		}
 		item = new Goat();
+		open = false;
 	}
 	
 	public Item getItem()
@@ -44,6 +46,8 @@ public class Box extends JButton implements Item
 		{
 			e.printStackTrace();
 		}
+		open = true;
+		updateUI();
 	}
 	
 	public void close()
@@ -56,6 +60,18 @@ public class Box extends JButton implements Item
 		{
 			e.printStackTrace();
 		}
+		open = false;
+		updateUI();
+	}
+	
+	public boolean isOpened()
+	{
+		return open;
+	}
+	
+	public boolean containsCar()
+	{
+		return item instanceof Car;
 	}
 	
 	public ImageIcon getImageIcon() throws IOException
