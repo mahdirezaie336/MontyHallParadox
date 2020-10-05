@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
