@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -15,6 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import com.formdev.flatlaf.FlatLightLaf;
 
 public class MainFrame extends JFrame
 {
@@ -26,11 +31,12 @@ public class MainFrame extends JFrame
 	private int state;
 	private int totalTests;
 	private int succeedTests;
-	private Random rand;
+	private SecureRandom rand;
 	
 	public MainFrame()
 	{
 		super("The Monty Hall Game");
+		setLookAndFeel();
 		impComponents = new HashMap<>();
 		setSize(460, 250);
 		setResizable(false);
@@ -42,7 +48,7 @@ public class MainFrame extends JFrame
 		succeedTests = 0;
 		state = 0;
 		states = new ArrayList<>();
-		rand = new Random();
+		rand = new SecureRandom();
 		
 		JLabel message = new JLabel("Choose one of boxes:");						// Creating message label
 		message.setBackground(Color.CYAN);
@@ -91,6 +97,17 @@ public class MainFrame extends JFrame
 		}
 	}
 	
+	private void setLookAndFeel()
+	{
+		try
+		{
+			UIManager.setLookAndFeel(new FlatLightLaf());
+		} catch (UnsupportedLookAndFeelException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	private void addStates()
 	{
 		State firstChoose = new State()
@@ -100,17 +117,16 @@ public class MainFrame extends JFrame
 			public void act(Object source)
 			{
 				showMessage("Choose one of boxes:");
-				
+
 				for(int i = 1; i < 4; ++i)
 				{
 					Box box = (Box) impComponents.get("Choice " + i + " Box");
-					box.fillWith(new Goat());
+					box.fillWith(Box.GOAT_ITEM);
 					box.close();
 				}
-				
 				String box = "Choice " + (rand.nextInt(3) + 1) + " Box";
 				System.out.println(box);
-				((Box)impComponents.get(box)).fillWith(new Car());
+				((Box)impComponents.get(box)).fillWith(Box.CAR_ITEM);
 				
 				state++;
 			}

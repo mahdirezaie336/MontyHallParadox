@@ -7,18 +7,26 @@ import javax.swing.ImageIcon;
 
 public class Car implements Item
 {
-
+	private ImageIcon imageIcon;
+	
 	public Car()
 	{
-		// TODO Auto-generated constructor stub
+		int size = MainFrame.DEFAULT_ITEM_SIZE;
+		Image i = null;
+		try
+		{
+			i = ImageIO.read(new File("./images/car.png")).getScaledInstance(size, size, Image.SCALE_DEFAULT);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		imageIcon = new ImageIcon(i);
 	}
 
 	@Override
-	public ImageIcon getImageIcon() throws IOException
+	public ImageIcon getImageIcon()
 	{
-		int size = MainFrame.DEFAULT_ITEM_SIZE;
-		Image i = ImageIO.read(new File("./images/car.png")).getScaledInstance(size, size, Image.SCALE_DEFAULT);
-		return new ImageIcon(i);
+		return imageIcon;
 	}
 
 }
