@@ -1,10 +1,10 @@
 import java.awt.Image;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+
 
 public class Box extends JButton implements Item
 {
@@ -23,7 +23,7 @@ public class Box extends JButton implements Item
 		Image i = null;
 		try
 		{
-			i = ImageIO.read(new File("./images/box.png")).getScaledInstance(size, size, Image.SCALE_DEFAULT);
+			i = ImageIO.read(this.getClass().getResource("images/box.png")).getScaledInstance(size, size, Image.SCALE_DEFAULT);
 		} catch (IOException e)
 		{
 			e.printStackTrace();

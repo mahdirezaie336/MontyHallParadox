@@ -124,7 +124,7 @@ public class MainFrame extends JFrame
 					box.close();
 				}
 				String box = "Choice " + (rand.nextInt(3) + 1) + " Box";
-				System.out.println(box);
+				//System.out.println(box);
 				((Box)impComponents.get(box)).fillWith(Box.CAR_ITEM);
 				
 				state++;
